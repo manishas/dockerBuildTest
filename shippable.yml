@@ -3,11 +3,13 @@ language: ruby
 rvm:
   - 2.0 #replace with ruby version you need http://docs.shippable.com/ci/ruby-continuous-integration/
 
-integrations:                             
+integrations:  
   hub:
-    - integrationName: myDockerHubIntegration    #replace with your subscription integration name   
+    #Creating Docker Registry integration: http://docs.shippable.com/platform/integration/dockerRegistryLogin/
+    - integrationName: myDockerHubIntegration    #replace with your subscription integration name.   
       type: dockerRegistryLogin   
-    - integrationName: aws-keys-integration    #replace with your subscription integration name
+    #Creating AWS Keys integration: http://docs.shippable.com/platform/integration/aws-keys/
+    - integrationName: aws-keys-integration    #replace with your subscription integration name.  
       region: us-east-1                   #replace with your AWS region
       type: ecr 
 
