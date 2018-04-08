@@ -1,0 +1,33 @@
+language: ruby
+
+rvm:
+  - 2.0 #replace with ruby version you need http://docs.shippable.com/ci/ruby-continuous-integration/
+
+integrations:                             
+  hub:
+    - integrationName: myDockerHubIntegration    #replace with your subscription integration name   
+      type: dockerRegistryLogin   
+    - integrationName: aws-keys-integration    #replace with your subscription integration name
+      region: us-east-1                   #replace with your AWS region
+      type: ecr 
+
+env:
+  global:
+    - RAILS_ENV: test
+    - ECR_URI: 780198655142.dkr.ecr.us-east-1.amazonaws.com/octopus
+ 
+build:
+  pre_ci:
+    - docker pull strixleviathan/octopus:ci-base
+    - docker-compose -f docker-compose-test.yml pull --parallel mysql redis
+    - docker-compose -f docker-compose-test.yml up -d mysql redis
+  ci:
+    - docker build -t octopus-cibuild .
+    - docker-compose -f docker-compose-test.yml up --no-build --abort-on-container-exit app
+  post_ci:
+    - set -x
+    - docker tag octopus-cibuild $ECR_URI:$BRANCH-$COMMIT
+    - docker push $ECR_URI:$BRANCH-$COMMIT
+  on_success:
+    - set -x
+    - docker pull $ECR_URI:$BRANCH-$COMMIT
